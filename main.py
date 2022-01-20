@@ -3,6 +3,8 @@ import json
 import time
 
 import fastapi
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from typing import Optional
@@ -20,6 +22,19 @@ room_data = {
     }
 
 api = fastapi.FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://127.0.0.1"
+]
+
+api.add_middleware(CORSMiddleware,
+                   allow_origins=["*"],
+                   allow_credentials=False,
+                   allow_methods=["*"],
+                   allow_headers=["*"])
+
+api.mount("/WindowState", StaticFiles(directory="WindowState", html=True), name="WindowState")
 
 
 def load_config(path="config/ccu3_config.json"):
@@ -135,6 +150,9 @@ def index():
            "</div>" \
            "<div>" \
            "Logging: <a href='/ccu3?log=true'>/ccu3?log=true</a>" \
+           "</div>" \
+           "<div>" \
+           "Website: <a href='/WindowState'>/WindowState</a>" \
            "</div>" \
            "</body>" \
            "</html>"

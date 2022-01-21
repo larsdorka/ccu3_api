@@ -174,10 +174,11 @@ def api_get_windowstates(log: Optional[bool] = None):
 
 
 if __name__ == '__main__':
+    # initialize and run uvicorn when called as a module
     load_config()
-    # login()
-    # get_data()
-    # logout()
     print(room_data)
-
     uvicorn.run(api, port=8000, host="127.0.0.1")
+else:
+    # initialize when called by externally run uvicorn
+    load_config()
+    print(room_data)

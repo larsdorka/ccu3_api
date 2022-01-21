@@ -25,6 +25,9 @@ function setstate(room_number, state) {
     
 }
 
-var ccu3api_url = "http://127.0.0.1:8000/ccu3";
+console.log(window.location.origin);
+//var ccu3api_url = "http://127.0.0.1:8000/ccu3";
+var ccu3api_url = window.location.origin + "/ccu3";
+
 getdata();
 window.setInterval(getdata, 5000);

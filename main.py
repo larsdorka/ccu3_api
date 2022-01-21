@@ -5,6 +5,7 @@ import time
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 import uvicorn
 
 from typing import Optional
@@ -142,22 +143,14 @@ def get_data():
 
 @api.get('/')
 def index():
-    body = "<html>" \
-           "<body style='padding: 10px;'>" \
-           "<h1>Welcome to the API</h1>" \
-           "<div>" \
-           "Try it: <a href='/ccu3'>/ccu3</a>" \
-           "</div>" \
-           "<div>" \
-           "Logging: <a href='/ccu3?log=true'>/ccu3?log=true</a>" \
-           "</div>" \
-           "<div>" \
-           "Website: <a href='/WindowState'>/WindowState</a>" \
-           "</div>" \
-           "</body>" \
-           "</html>"
+    response = RedirectResponse(url='/WindowState')
+    return response
 
-    return fastapi.responses.HTMLResponse(content=body)
+
+@api.get('/favicon.ico')
+def favicon():
+    response = RedirectResponse(url='/WindowState/favicon.ico')
+    return response
 
 
 @api.get('/ccu3')

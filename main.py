@@ -7,8 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import uvicorn
-
 from typing import Optional
+
+from room_data import RoomData, Room
 
 login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
 logout_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.logout", "params": {"_session_id_":""}}'
@@ -18,16 +19,9 @@ _session_id = ""
 _logging = False
 
 config_data = {}
-room_data = {
-    "rooms":  []
-    }
+room_data = RoomData()
 
 api = fastapi.FastAPI()
-
-origins = [
-    "http://localhost",
-    "http://127.0.0.1"
-]
 
 api.add_middleware(CORSMiddleware,
                    allow_origins=["*"],
@@ -38,16 +32,16 @@ api.add_middleware(CORSMiddleware,
 api.mount("/WindowState", StaticFiles(directory="WindowState", html=True), name="WindowState")
 
 
-def load_config(path="config/ccu3_config.json"):
+def load_config(path="config/config.json"):
     global config_data, room_data
     try:
         with open(path) as file:
             config_data = json.load(file)
-            print("room count: {0}".format(len(config_data['variables'])))
-            room_data['rooms'].clear()
-            for room_number in range(len(config_data['variables'])):
-                new_room = {"name": config_data['variables'][room_number]['name'], "id": config_data['variables'][room_number]['id'], "state": True}
-                room_data['rooms'].append(new_room)
+            print("room count: {0}".format(len(config_data['ccu3_config']['variables'])))
+            room_data.rooms.clear()
+            for room_number in range(len(config_data['ccu3_config']['variables'])):
+                new_room = Room(name=config_data['ccu3_config']['variables'][room_number]['name'], id=config_data['ccu3_config']['variables'][room_number]['id'], state=False)
+                room_data.rooms.append(new_room)
     except Exception as ex:
         print("error on reading config file: " + str(ex))
         return False
@@ -57,13 +51,13 @@ def load_config(path="config/ccu3_config.json"):
 def login():
     global _session_id
     login_object = json.loads(login_string)
-    login_object['params']['username'] = config_data['username']
-    login_object['params']['password'] = config_data['password']
+    login_object['params']['username'] = config_data['ccu3_config']['connection']['username']
+    login_object['params']['password'] = config_data['ccu3_config']['connection']['password']
     login_body = json.dumps(login_object)
     if _logging:
         print("Request: {0}".format(login_body))
     start_time = time.time()
-    response_login = requests.post(config_data['url'], login_body)
+    response_login = requests.post(config_data['ccu3_config']['connection']['url'], login_body)
     stop_time = time.time()
     duration = (stop_time - start_time) * 1000
     if _logging:
@@ -84,7 +78,7 @@ def logout():
         if _logging:
             print("Request: {0}".format(logout_body))
         start_time = time.time()
-        response_logout = requests.post(config_data['url'], logout_body)
+        response_logout = requests.post(config_data['ccu3_config']['connection']['url'], logout_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -108,10 +102,11 @@ def get_all():
         if _logging:
             print("Request: {0}".format(getall_body))
         start_time = time.time()
-        response_getall = requests.post(config_data['url'], getall_body)
+        response_getall = requests.post(config_data['ccu3_config']['connection']['url'], getall_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
+            print("Response: {0}".format(response_getall.text))
             print("Duration: {0:.0f} ms".format(duration))
         response_getall_object = json.loads(response_getall.text)
     else:
@@ -126,10 +121,10 @@ def get_data():
     response_getall_object = get_all()
     if response_getall_object is not None:
         if response_getall_object['result'] is not None:
-            for room in room_data['rooms']:
+            for room in room_data.rooms:
                 for result in response_getall_object['result']:
-                    if result['id'] == room['id']:
-                        room['state'] = (result['value'] == 'true')
+                    if int(result['id']) == room.id:
+                        room.state = (result['value'] == 'true')
                         break
         if response_getall_object['error'] is not None:
             error_state = True
@@ -153,8 +148,8 @@ def favicon():
     return response
 
 
-@api.get('/ccu3')
-def api_get_windowstates(log: Optional[bool] = None):
+@api.get('/api/v1/ccu3_get_windowstates')
+def api_get_windowstates(log: Optional[bool] = None) -> RoomData:
     global _logging
     if log is not None:
         _logging = log

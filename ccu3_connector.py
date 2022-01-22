@@ -3,6 +3,7 @@ import json
 import time
 
 from room_data import RoomData, Room
+from datetime import datetime
 
 
 login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
@@ -110,6 +111,7 @@ def get_data():
                     if int(result['id']) == room.id:
                         room.state = (result['value'] == 'true')
                         break
+            room_data.meta.lastUpdated = datetime.now()
         if response_getall_object['error'] is not None:
             error_state = True
             error_message = response_getall_object['error']['message']

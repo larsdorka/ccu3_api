@@ -2,13 +2,11 @@ import requests
 import json
 import time
 
-from room_data import RoomData, Room
 from datetime import datetime
 
+from models.RoomData import RoomData, Room
+from models.JsonRpcRequest import *
 
-login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
-logout_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.logout", "params": {"_session_id_":""}}'
-getall_string = '{"jsonrpc": "1.1", "id": 0, "method": "SysVar.getAll", "params": {"_session_id_":""}}'
 
 _session_id = ""
 _logging = False
@@ -35,10 +33,10 @@ def load_config(path="config/config.json"):
 
 def login():
     global _session_id
-    login_object = json.loads(login_string)
-    login_object['params']['username'] = config_data['ccu3_config']['connection']['username']
-    login_object['params']['password'] = config_data['ccu3_config']['connection']['password']
-    login_body = json.dumps(login_object)
+    login_request = LoginRequest()
+    login_request.params.username = config_data['ccu3_config']['connection']['username']
+    login_request.params.password = config_data['ccu3_config']['connection']['password']
+    login_body = str(login_request)
     if _logging:
         print("Request: {0}".format(login_body))
     start_time = time.time()
@@ -55,9 +53,9 @@ def login():
 
 def logout():
     global _session_id
-    logout_object = json.loads(logout_string)
-    logout_object['params']['_session_id_'] = _session_id
-    logout_body = json.dumps(logout_object)
+    logout_request = LogoutRequest()
+    logout_request.params.session_id = _session_id
+    logout_body = str(logout_request)
     result = True
     if _session_id != "":
         if _logging:
@@ -80,9 +78,9 @@ def logout():
 
 def get_all():
     response_getall_object = None
-    getall_object = json.loads(getall_string)
-    getall_object['params']['_session_id_'] = _session_id
-    getall_body = json.dumps(getall_object)
+    getall_request = GetallRequest()
+    getall_request.params.session_id = _session_id
+    getall_body = str(getall_request)
     if _session_id != "":
         if _logging:
             print("Request: {0}".format(getall_body))

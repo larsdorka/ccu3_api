@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 import uvicorn
 from typing import Optional
 
-from room_data import RoomData
+from models.RoomData import RoomData
 import ccu3_connector
 
 

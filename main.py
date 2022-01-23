@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # initialize and run uvicorn when called as a module
     ccu3_connector.load_config()
     print(ccu3_connector.room_data)
-    uvicorn.run(api, port=8000, host="127.0.0.1")
+    uvicorn.run("main:api", port=8000, host="127.0.0.1", reload=True)
 else:
     # production mode
     # initialize when called by externally run uvicorn

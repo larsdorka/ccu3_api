@@ -8,6 +8,7 @@ from typing import Optional, List
 
 from models.WindowStateData import WindowStateData
 from models.Room import Room
+from models.Program import Program
 import ccu3_connector
 
 
@@ -66,6 +67,14 @@ def api_list_allrooms() -> List[str]:
 def api_get_room(room_id: str) -> Room:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getRoom(room_id)
+    ccu3_connector.rpc_logout()
+    return response
+
+
+@api.get('/api/v1/ccu3_get_allprograms')
+def api_get_allprograms() -> List[Program]:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_getAllPrograms()
     ccu3_connector.rpc_logout()
     return response
 

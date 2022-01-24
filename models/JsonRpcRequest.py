@@ -59,6 +59,16 @@ class RoomGetRequest(JsonRpcRequest):
     method: str = "Room.get"
 
 
+class ProgramGetAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
+    method: str = "Program.getAll"
+
+
+class ProgramGetRequest(JsonRpcRequest):
+    params: SessionIdAndIdParams = SessionIdAndIdParams()
+    method: str = "Program.get"
+
+
 # login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
 # logout_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.logout", "params": {"_session_id_":""}}'
 # getall_string = '{"jsonrpc": "1.1", "id": 0, "method": "SysVar.getAll", "params": {"_session_id_":""}}'

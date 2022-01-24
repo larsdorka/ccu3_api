@@ -11,17 +11,22 @@ class JsonRpcRequest(BaseModel):
         return self.json(by_alias=True)
 
 
+class NoParams(BaseModel):
+    pass
+
+
 class LoginParams(BaseModel):
     username: str = ""
     password: str = ""
 
 
-class LogoutParams(BaseModel):
+class SessionIdParams(BaseModel):
     session_id: str = Field("", alias="_session_id_")
 
 
-class GetallParams(BaseModel):
+class SessionIdAndIdParams(BaseModel):
     session_id: str = Field("", alias="_session_id_")
+    id: str = ""
 
 
 class LoginRequest(JsonRpcRequest):
@@ -30,13 +35,28 @@ class LoginRequest(JsonRpcRequest):
 
 
 class LogoutRequest(JsonRpcRequest):
-    params: LogoutParams = LogoutParams()
+    params: SessionIdParams = SessionIdParams()
     method: str = "Session.logout"
 
 
-class GetallRequest(JsonRpcRequest):
-    params: GetallParams = GetallParams()
+class GetAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
     method: str = "SysVar.getAll"
+
+
+class RoomGetAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
+    method: str = "Room.getAll"
+
+
+class RoomListAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
+    method: str = "Room.listAll"
+
+
+class RoomGetRequest(JsonRpcRequest):
+    params: SessionIdAndIdParams = SessionIdAndIdParams()
+    method: str = "Room.get"
 
 
 # login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'

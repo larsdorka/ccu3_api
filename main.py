@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import uvicorn
-from typing import Optional
+import json
+from typing import Optional, List
 
 from models.RoomData import RoomData
 import ccu3_connector
@@ -38,17 +39,41 @@ def api_get_windowstates(log: Optional[bool] = None) -> RoomData:
         ccu3_connector._logging = log
     else:
         ccu3_connector._logging = False
-    ccu3_connector.login()
-    ccu3_connector.get_data()
-    ccu3_connector.logout()
-    return ccu3_connector.room_data
+    ccu3_connector.rpc_login()
+    ccu3_connector.get_windowstatedata()
+    ccu3_connector.rpc_logout()
+    return ccu3_connector.windowstate_data
+
+
+@api.get('/api/v1/ccu3_get_allrooms')
+def api_get_allrooms():
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_getAllRooms()
+    ccu3_connector.rpc_logout()
+    return json.dumps(response)
+
+
+@api.get('/api/v1/ccu3_list_allrooms')
+def api_list_allrooms() -> List[str]:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_listAllRooms()
+    ccu3_connector.rpc_logout()
+    return response
+
+
+@api.get('/api/v1/ccu3_get_room')
+def api_get_room(room_id: str):
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_getRoom(room_id)
+    ccu3_connector.rpc_logout()
+    return json.dumps(response)
 
 
 if __name__ == '__main__':
     # development mode, local hosting only
     # initialize and run uvicorn when called as a module
     ccu3_connector.load_config()
-    print(ccu3_connector.room_data)
+    print(ccu3_connector.windowstate_data)
     uvicorn.run("main:api", port=8000, host="127.0.0.1", reload=True)
 else:
     # production mode

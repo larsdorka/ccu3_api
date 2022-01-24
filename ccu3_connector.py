@@ -12,26 +12,26 @@ _session_id = ""
 _logging = False
 
 config_data = {}
-room_data = RoomData()
+windowstate_data = RoomData()
 
 
 def load_config(path="config/config.json"):
-    global config_data, room_data
+    global config_data, windowstate_data
     try:
         with open(path) as file:
             config_data = json.load(file)
             print("room count: {0}".format(len(config_data['ccu3_config']['variables'])))
-            room_data.rooms.clear()
+            windowstate_data.rooms.clear()
             for room_number in range(len(config_data['ccu3_config']['variables'])):
                 new_room = Room(name=config_data['ccu3_config']['variables'][room_number]['name'], id=config_data['ccu3_config']['variables'][room_number]['id'], state=False)
-                room_data.rooms.append(new_room)
+                windowstate_data.rooms.append(new_room)
     except Exception as ex:
         print("error on reading config file: " + str(ex))
         return False
-    return True
+    return
 
 
-def login():
+def rpc_login():
     global _session_id
     login_request = LoginRequest()
     login_request.params.username = config_data['ccu3_config']['connection']['username']
@@ -48,10 +48,10 @@ def login():
         print("Duration: {0:.0f} ms".format(duration))
     response_login_object = json.loads(response_login.text)
     _session_id = response_login_object['result']
-    return _session_id
+    return
 
 
-def logout():
+def rpc_logout():
     global _session_id
     logout_request = LogoutRequest()
     logout_request.params.session_id = _session_id
@@ -73,12 +73,12 @@ def logout():
             _session_id = ""
     else:
         print("warning: no session")
-    return result
+    return
 
 
-def get_all():
+def rpc_getall():
     response_getall_object = None
-    getall_request = GetallRequest()
+    getall_request = GetAllRequest()
     getall_request.params.session_id = _session_id
     getall_body = str(getall_request)
     if _session_id != "":
@@ -97,19 +97,19 @@ def get_all():
     return response_getall_object
 
 
-def get_data():
-    global room_data
+def get_windowstatedata():
+    global windowstate_data
     error_state = False
     error_message = ""
-    response_getall_object = get_all()
+    response_getall_object = rpc_getall()
     if response_getall_object is not None:
         if response_getall_object['result'] is not None:
-            for room in room_data.rooms:
+            for room in windowstate_data.rooms:
                 for result in response_getall_object['result']:
                     if int(result['id']) == room.id:
                         room.state = (result['value'] == 'true')
                         break
-            room_data.meta.lastUpdated = datetime.now()
+            windowstate_data.meta.lastUpdated = datetime.now()
         if response_getall_object['error'] is not None:
             error_state = True
             error_message = response_getall_object['error']['message']
@@ -118,3 +118,67 @@ def get_data():
     if error_state:
         print(error_message)
     return
+
+
+def rpc_getAllRooms():
+    response_getall_object = None
+    getall_request = RoomGetAllRequest()
+    getall_request.params.session_id = _session_id
+    getall_body = str(getall_request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(getall_body))
+        start_time = time.time()
+        response_getall = requests.post(config_data['ccu3_config']['connection']['url'], getall_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response_getall.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        response_getall_object = json.loads(response_getall.text)
+    else:
+        print("warning: no session")
+    return response_getall_object['result']
+
+
+def rpc_listAllRooms():
+    response_listall_object = None
+    listall_request = RoomListAllRequest()
+    listall_request.params.session_id = _session_id
+    listall_body = str(listall_request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(listall_body))
+        start_time = time.time()
+        response_listall = requests.post(config_data['ccu3_config']['connection']['url'], listall_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response_listall.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        response_listall_object = json.loads(response_listall.text)
+    else:
+        print("warning: no session")
+    return response_listall_object['result']
+
+
+def rpc_getRoom(room_id: str):
+    response_getroom_object = None
+    getroom_request = RoomGetRequest()
+    getroom_request.params.session_id = _session_id
+    getroom_request.params.id = room_id
+    getroom_body = str(getroom_request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(getroom_body))
+        start_time = time.time()
+        response_getroom = requests.post(config_data['ccu3_config']['connection']['url'], getroom_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response_getroom.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        response_getroom_object = json.loads(response_getroom.text)
+    else:
+        print("warning: no session")
+    return response_getroom_object['result']

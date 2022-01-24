@@ -9,6 +9,8 @@ from typing import Optional, List
 from models.WindowStateData import WindowStateData
 from models.Room import Room
 from models.Program import Program
+from models.Interface import Interface
+
 import ccu3_connector
 
 
@@ -35,12 +37,20 @@ def favicon():
     return response
 
 
+@api.get('/api/v1/activate_logging')
+def api_activate_logging():
+    ccu3_connector._logging = True
+    return dict()
+
+
+@api.get('/api/v1/deactivate_logging')
+def api_deactivate_logging():
+    ccu3_connector._logging = False
+    return dict()
+
+
 @api.get('/api/v1/ccu3_get_windowstates')
-def api_get_windowstates(log: Optional[bool] = None) -> WindowStateData:
-    if log is not None:
-        ccu3_connector._logging = log
-    else:
-        ccu3_connector._logging = False
+def api_get_windowstates() -> WindowStateData:
     ccu3_connector.rpc_login()
     ccu3_connector.get_windowstatedata()
     ccu3_connector.rpc_logout()
@@ -75,6 +85,22 @@ def api_get_room(room_id: str) -> Room:
 def api_get_allprograms() -> List[Program]:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getAllPrograms()
+    ccu3_connector.rpc_logout()
+    return response
+
+
+@api.get('/api/v1/ccu3_list_alldevices')
+def api_list_alldevices() -> List[str]:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_listAllDevices()
+    ccu3_connector.rpc_logout()
+    return response
+
+
+@api.get('/api/v1/ccu3_list_allinterfaces')
+def api_list_allinterfaces() -> List[Interface]:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_listAllInterfaces()
     ccu3_connector.rpc_logout()
     return response
 

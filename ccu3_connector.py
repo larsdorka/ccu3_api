@@ -9,9 +9,10 @@ from models.JsonRpcRequest import *
 from models.WindowStateData import WindowStateData, RoomState
 from models.Room import Room
 from models.Program import Program
+from models.Interface import Interface
 
 _session_id = ""
-_logging = True
+_logging = False
 
 config_data = {}
 windowstate_data = WindowStateData()
@@ -77,9 +78,9 @@ def rpc_logout():
     return
 
 
-def rpc_getall():
+def rpc_getAllVariables():
     result_object = None
-    request = GetAllRequest()
+    request = VariableGetAllRequest()
     request.params.session_id = _session_id
     request_body = str(request)
     if _session_id != "":
@@ -102,7 +103,7 @@ def get_windowstatedata():
     global windowstate_data
     error_state = False
     error_message = ""
-    response_getall_object = rpc_getall()
+    response_getall_object = rpc_getAllVariables()
     if response_getall_object is not None:
         if response_getall_object['result'] is not None:
             for room in windowstate_data.rooms:
@@ -228,6 +229,56 @@ def rpc_getAllPrograms() -> List[Program]:
                     new_program.isInternal = result['isInternal']
                     new_program.lastExecuteTime = result['lastExecuteTime']
                     result_object.append(new_program)
+    else:
+        print("warning: no session")
+    return result_object
+
+
+def rpc_listAllDevices() -> List[str]:
+    result_object = None
+    request = DeviceListAllRequest()
+    request.params.session_id = _session_id
+    request_body = str(request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(request_body))
+        start_time = time.time()
+        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        result_object = json.loads(response.text)['result']
+    else:
+        print("warning: no session")
+    return result_object
+
+
+def rpc_listAllInterfaces() -> List[Interface]:
+    result_object: List[Interface] = []
+    request = InterfaceListAllRequest()
+    request.params.session_id = _session_id
+    request_body = str(request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(request_body))
+        start_time = time.time()
+        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        response_object = json.loads(response.text)
+        if response_object is not None:
+            if response_object['result'] is not None:
+                for result in response_object['result']:
+                    new_interface = Interface()
+                    new_interface.name = result['name']
+                    new_interface.port = result['port']
+                    new_interface.info = result['info']
+                    result_object.append(new_interface)
     else:
         print("warning: no session")
     return result_object

@@ -39,7 +39,7 @@ class LogoutRequest(JsonRpcRequest):
     method: str = "Session.logout"
 
 
-class GetAllRequest(JsonRpcRequest):
+class VariableGetAllRequest(JsonRpcRequest):
     params: SessionIdParams = SessionIdParams()
     method: str = "SysVar.getAll"
 
@@ -68,6 +68,15 @@ class ProgramGetRequest(JsonRpcRequest):
     params: SessionIdAndIdParams = SessionIdAndIdParams()
     method: str = "Program.get"
 
+
+class DeviceListAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
+    method: str = "Device.listAll"
+
+
+class InterfaceListAllRequest(JsonRpcRequest):
+    params: SessionIdParams = SessionIdParams()
+    method: str = "Interface.listInterfaces"
 
 # login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
 # logout_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.logout", "params": {"_session_id_":""}}'

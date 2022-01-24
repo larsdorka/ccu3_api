@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime
 
 
-class Room(BaseModel):
+class RoomState(BaseModel):
     name: str = ""
     id: int = 0
     state: bool = False
@@ -13,6 +13,6 @@ class Meta(BaseModel):
     lastUpdated: datetime = None
 
 
-class RoomData(BaseModel):
-    rooms: List[Room] = []
+class WindowStateData(BaseModel):
+    rooms: List[RoomState] = []
     meta: Meta = Meta()

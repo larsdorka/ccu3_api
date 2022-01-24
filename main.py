@@ -6,7 +6,8 @@ import uvicorn
 import json
 from typing import Optional, List
 
-from models.RoomData import RoomData
+from models.WindowStateData import WindowStateData
+from models.Room import Room
 import ccu3_connector
 
 
@@ -34,7 +35,7 @@ def favicon():
 
 
 @api.get('/api/v1/ccu3_get_windowstates')
-def api_get_windowstates(log: Optional[bool] = None) -> RoomData:
+def api_get_windowstates(log: Optional[bool] = None) -> WindowStateData:
     if log is not None:
         ccu3_connector._logging = log
     else:
@@ -46,11 +47,11 @@ def api_get_windowstates(log: Optional[bool] = None) -> RoomData:
 
 
 @api.get('/api/v1/ccu3_get_allrooms')
-def api_get_allrooms():
+def api_get_allrooms() -> List[Room]:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getAllRooms()
     ccu3_connector.rpc_logout()
-    return json.dumps(response)
+    return response
 
 
 @api.get('/api/v1/ccu3_list_allrooms')
@@ -62,18 +63,17 @@ def api_list_allrooms() -> List[str]:
 
 
 @api.get('/api/v1/ccu3_get_room')
-def api_get_room(room_id: str):
+def api_get_room(room_id: str) -> Room:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getRoom(room_id)
     ccu3_connector.rpc_logout()
-    return json.dumps(response)
+    return response
 
 
 if __name__ == '__main__':
     # development mode, local hosting only
     # initialize and run uvicorn when called as a module
     ccu3_connector.load_config()
-    print(ccu3_connector.windowstate_data)
     uvicorn.run("main:api", port=8000, host="127.0.0.1", reload=True)
 else:
     # production mode

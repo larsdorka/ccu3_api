@@ -3,16 +3,17 @@ import json
 import time
 
 from datetime import datetime
+from typing import List
 
-from models.RoomData import RoomData, Room
+from models.WindowStateData import *
 from models.JsonRpcRequest import *
-
+from models.Room import *
 
 _session_id = ""
 _logging = False
 
 config_data = {}
-windowstate_data = RoomData()
+windowstate_data = WindowStateData()
 
 
 def load_config(path="config/config.json"):
@@ -23,7 +24,7 @@ def load_config(path="config/config.json"):
             print("room count: {0}".format(len(config_data['ccu3_config']['variables'])))
             windowstate_data.rooms.clear()
             for room_number in range(len(config_data['ccu3_config']['variables'])):
-                new_room = Room(name=config_data['ccu3_config']['variables'][room_number]['name'], id=config_data['ccu3_config']['variables'][room_number]['id'], state=False)
+                new_room = RoomState(name=config_data['ccu3_config']['variables'][room_number]['name'], id=config_data['ccu3_config']['variables'][room_number]['id'], state=False)
                 windowstate_data.rooms.append(new_room)
     except Exception as ex:
         print("error on reading config file: " + str(ex))
@@ -56,7 +57,6 @@ def rpc_logout():
     logout_request = LogoutRequest()
     logout_request.params.session_id = _session_id
     logout_body = str(logout_request)
-    result = True
     if _session_id != "":
         if _logging:
             print("Request: {0}".format(logout_body))
@@ -120,8 +120,8 @@ def get_windowstatedata():
     return
 
 
-def rpc_getAllRooms():
-    response_getall_object = None
+def rpc_getAllRooms() -> List[Room]:
+    response_allRooms: List[Room] = []
     getall_request = RoomGetAllRequest()
     getall_request.params.session_id = _session_id
     getall_body = str(getall_request)
@@ -136,12 +136,22 @@ def rpc_getAllRooms():
             print("Response: {0}".format(response_getall.text))
             print("Duration: {0:.0f} ms".format(duration))
         response_getall_object = json.loads(response_getall.text)
+        if response_getall_object is not None:
+            if response_getall_object['result'] is not None:
+                for result in response_getall_object['result']:
+                    new_room = Room()
+                    new_room.id = result['id']
+                    new_room.name = result['name']
+                    new_room.description = result['description']
+                    for channelId in result['channelIds']:
+                        new_room.channelIds.append(channelId)
+                    response_allRooms.append(new_room)
     else:
         print("warning: no session")
-    return response_getall_object['result']
+    return response_allRooms
 
 
-def rpc_listAllRooms():
+def rpc_listAllRooms() -> List[str]:
     response_listall_object = None
     listall_request = RoomListAllRequest()
     listall_request.params.session_id = _session_id
@@ -162,8 +172,8 @@ def rpc_listAllRooms():
     return response_listall_object['result']
 
 
-def rpc_getRoom(room_id: str):
-    response_getroom_object = None
+def rpc_getRoom(room_id: str) -> Room:
+    response_room: Room = Room()
     getroom_request = RoomGetRequest()
     getroom_request.params.session_id = _session_id
     getroom_request.params.id = room_id
@@ -179,6 +189,13 @@ def rpc_getRoom(room_id: str):
             print("Response: {0}".format(response_getroom.text))
             print("Duration: {0:.0f} ms".format(duration))
         response_getroom_object = json.loads(response_getroom.text)
+        if response_getroom_object is not None:
+            if response_getroom_object['result'] is not None:
+                response_room.id = response_getroom_object['result']['id']
+                response_room.name = response_getroom_object['result']['name']
+                response_room.description = response_getroom_object['result']['description']
+                for channelId in response_getroom_object['result']['channelIds']:
+                    response_room.channelIds.append(channelId)
     else:
         print("warning: no session")
-    return response_getroom_object['result']
+    return response_room

@@ -5,9 +5,9 @@ import time
 from datetime import datetime
 from typing import List
 
-from models.WindowStateData import *
 from models.JsonRpcRequest import *
-from models.Room import *
+from models.WindowStateData import WindowStateData, RoomState
+from models.Room import Room
 
 _session_id = ""
 _logging = False

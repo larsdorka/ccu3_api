@@ -98,7 +98,7 @@ def api_list_alldevices() -> List[str]:
 
 
 @api.get('/api/v1/ccu3_get_device')
-def api_get_room(device_id: str) -> Room:
+def api_get_device(device_id: str) -> Room:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getDevice(device_id)
     ccu3_connector.rpc_logout()
@@ -109,6 +109,14 @@ def api_get_room(device_id: str) -> Room:
 def api_list_allinterfaces() -> List[Interface]:
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_listAllInterfaces()
+    ccu3_connector.rpc_logout()
+    return response
+
+
+@api.get('/api/v1/ccu3_get_value_from_channel')
+def api_get_value_from_channel(channel_id: str) -> Room:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_getDevice(channel_id)
     ccu3_connector.rpc_logout()
     return response
 

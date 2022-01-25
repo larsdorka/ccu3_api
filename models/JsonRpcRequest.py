@@ -74,6 +74,11 @@ class DeviceListAllRequest(JsonRpcRequest):
     method: str = "Device.listAll"
 
 
+class DeviceGetRequest(JsonRpcRequest):
+    params: SessionIdAndIdParams = SessionIdAndIdParams()
+    method: str = "Device.get"
+
+
 class InterfaceListAllRequest(JsonRpcRequest):
     params: SessionIdParams = SessionIdParams()
     method: str = "Interface.listInterfaces"

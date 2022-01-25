@@ -255,6 +255,29 @@ def rpc_listAllDevices() -> List[str]:
     return result_object
 
 
+def rpc_getDevice(device_id: str):
+    result_object: None
+    request = DeviceGetRequest()
+    request.params.session_id = _session_id
+    request.params.id = device_id
+    request_body = str(request)
+    if _session_id != "":
+        if _logging:
+            print("Request: {0}".format(request_body))
+        start_time = time.time()
+        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        stop_time = time.time()
+        duration = (stop_time - start_time) * 1000
+        if _logging:
+            print("Response: {0}".format(response.text))
+            print("Duration: {0:.0f} ms".format(duration))
+        response_object = json.loads(response.text)
+        result_object = response_object
+    else:
+        print("warning: no session")
+    return result_object
+
+
 def rpc_listAllInterfaces() -> List[Interface]:
     result_object: List[Interface] = []
     request = InterfaceListAllRequest()

@@ -97,6 +97,14 @@ def api_list_alldevices() -> List[str]:
     return response
 
 
+@api.get('/api/v1/ccu3_get_device')
+def api_get_room(device_id: str) -> Room:
+    ccu3_connector.rpc_login()
+    response = ccu3_connector.rpc_getDevice(device_id)
+    ccu3_connector.rpc_logout()
+    return response
+
+
 @api.get('/api/v1/ccu3_list_allinterfaces')
 def api_list_allinterfaces() -> List[Interface]:
     ccu3_connector.rpc_login()

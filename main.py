@@ -13,7 +13,6 @@ from models.Interface import Interface
 
 import ccu3_connector
 
-
 api = fastapi.FastAPI()
 
 api.add_middleware(CORSMiddleware,
@@ -114,7 +113,7 @@ def api_list_allinterfaces() -> List[Interface]:
 
 
 @api.get('/api/v1/ccu3_get_value_from_channel')
-def api_get_value_from_channel(channel_id: str) -> Room:
+def api_get_value_from_channel(channel_id: str):
     ccu3_connector.rpc_login()
     response = ccu3_connector.rpc_getDevice(channel_id)
     ccu3_connector.rpc_logout()
@@ -124,7 +123,6 @@ def api_get_value_from_channel(channel_id: str) -> Room:
 if __name__ == '__main__':
     # development mode, local hosting only
     # initialize and run uvicorn when called as a module
-    ccu3_connector.load_config()
     uvicorn.run("main:api", port=8000, host="127.0.0.1", reload=True)
 else:
     # production mode

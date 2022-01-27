@@ -1,3 +1,5 @@
+import sys
+import os
 import contextlib
 import time
 
@@ -145,7 +147,15 @@ def api_get_value_from_channel(channel_id: str):
 
 
 if __name__ == '__main__':
+    logpath = os.path.join(os.getcwd(), "logs")
+    if not os.path.exists(logpath):
+        os.mkdir(logpath)
+    file_stdout = open(os.path.join(logpath, "stdout.log"), "a")
+    sys.stdout = file_stdout
+    sys.stderr = file_stdout
+
     ccu3_connector.load_config()
+
     print("starting...")
     uvi_config = uvicorn.Config(api, port=8000, host="0.0.0.0")
     uvi_server = BackgroundServer(config=uvi_config)
@@ -158,3 +168,5 @@ if __name__ == '__main__':
             pass
         print("stopping...")
     print("stopped")
+
+    file_stdout.close()

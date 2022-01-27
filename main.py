@@ -33,7 +33,11 @@ if __name__ == '__main__':
     logpath = os.path.join(os.getcwd(), "logs")
     if not os.path.exists(logpath):
         os.mkdir(logpath)
-    file_stdout = open(os.path.join(logpath, "stdout.log"), "a")
+    logfilepath = os.path.join(logpath, "stdout.log")
+    file_stdout = open(logfilepath, "a")
+    print("")
+    print("application started")
+    print("redirecting output to {}".format(logfilepath))
     sys.stdout = file_stdout
     sys.stderr = file_stdout
 

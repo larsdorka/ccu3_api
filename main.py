@@ -1,17 +1,41 @@
+import contextlib
+import time
+
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import uvicorn
-import json
-from typing import Optional, List
+from typing import List
 
 from models.WindowStateData import WindowStateData
 from models.Room import Room
 from models.Program import Program
 from models.Interface import Interface
 
+import threading
+
 import ccu3_connector
+
+
+class BackgroundServer(uvicorn.Server):
+    def install_signal_handlers(self) -> None:
+        pass
+        return
+
+    @contextlib.contextmanager
+    def run_in_thread(self) -> None:
+        thread = threading.Thread(target=self.run)
+        thread.start()
+        try:
+            while not self.started:
+                time.sleep(1e-3)
+            yield
+        finally:
+            self.should_exit = True
+            thread.join()
+        return
+
 
 api = fastapi.FastAPI()
 
@@ -121,10 +145,16 @@ def api_get_value_from_channel(channel_id: str):
 
 
 if __name__ == '__main__':
-    # development mode, local hosting only
-    # initialize and run uvicorn when called as a module
-    uvicorn.run("main:api", port=8000, host="127.0.0.1", reload=True)
-else:
-    # production mode
-    # initialize when called by externally run uvicorn
     ccu3_connector.load_config()
+    print("starting...")
+    uvi_config = uvicorn.Config(api, port=8000, host="0.0.0.0")
+    uvi_server = BackgroundServer(config=uvi_config)
+    with uvi_server.run_in_thread():
+        time.sleep(1)
+        print("started")
+        try:
+            x = input("press any key")
+        except KeyboardInterrupt:
+            pass
+        print("stopping...")
+    print("stopped")

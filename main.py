@@ -3,11 +3,14 @@ import os
 import contextlib
 import time
 import threading
+import json
 
 import uvicorn
 
 import asgi_api
 import ccu3_connector
+
+config_data = {}
 
 
 class BackgroundServer(uvicorn.Server):
@@ -41,10 +44,18 @@ if __name__ == '__main__':
     sys.stdout = file_stdout
     sys.stderr = file_stdout
 
-    ccu3_connector.load_config()
+    try:
+        with open("config/config.json") as file:
+            config_data = json.load(file)
+    except Exception as ex:
+        print("error on reading config file: " + str(ex))
+        file_stdout.close()
+        sys.exit()
+
+    ccu3_connector.initialize(config_data['ccu3_config'])
 
     print("starting...")
-    uvi_config = uvicorn.Config(asgi_api.api, port=8000, host="0.0.0.0")
+    uvi_config = uvicorn.Config(asgi_api.api, port=config_data['server_config']['port'], host=config_data['server_config']['host'], forwarded_allow_ips="*")
     uvi_server = BackgroundServer(config=uvi_config)
     with uvi_server.run_in_thread():
         time.sleep(1)

@@ -14,36 +14,33 @@ from models.Interface import Interface
 _session_id = ""
 _logging = False
 
-config_data = {}
-windowstate_data = WindowStateData()
+ccu3_config_data: dict = {}
+windowstate_data: WindowStateData = WindowStateData()
 
 
-def load_config(path="config/config.json"):
-    global config_data, windowstate_data
-    try:
-        with open(path) as file:
-            config_data = json.load(file)
-            print("room count: {0}".format(len(config_data['ccu3_config']['variables'])))
-            windowstate_data.rooms.clear()
-            for room_number in range(len(config_data['ccu3_config']['variables'])):
-                new_room = RoomState(name=config_data['ccu3_config']['variables'][room_number]['name'], id=config_data['ccu3_config']['variables'][room_number]['id'], state=False)
-                windowstate_data.rooms.append(new_room)
-    except Exception as ex:
-        print("error on reading config file: " + str(ex))
-        return False
+def initialize(ccu3_config: dict):
+    global ccu3_config_data, windowstate_data
+    ccu3_config_data = ccu3_config
+    windowstate_data.rooms.clear()
+    for room_number in range(len(ccu3_config_data['variables'])):
+        new_room = RoomState(name=ccu3_config_data['variables'][room_number]['name'], id=ccu3_config_data['variables'][room_number]['id'], state=False)
+        windowstate_data.rooms.append(new_room)
+    print("")
+    print("ccu3_connector initialized")
+    print("room count: {0}".format(len(windowstate_data.rooms)))
     return
 
 
 def rpc_login():
     global _session_id
     request = LoginRequest()
-    request.params.username = config_data['ccu3_config']['connection']['username']
-    request.params.password = config_data['ccu3_config']['connection']['password']
+    request.params.username = ccu3_config_data['connection']['username']
+    request.params.password = ccu3_config_data['connection']['password']
     request_body = str(request)
     if _logging:
         print("Request: {0}".format(request_body))
     start_time = time.time()
-    response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+    response = requests.post(ccu3_config_data['connection']['url'], request_body)
     stop_time = time.time()
     duration = (stop_time - start_time) * 1000
     if _logging:
@@ -63,7 +60,7 @@ def rpc_logout():
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -87,7 +84,7 @@ def rpc_getAllVariables():
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -131,7 +128,7 @@ def rpc_getAllRooms() -> List[Room]:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -162,7 +159,7 @@ def rpc_listAllRooms() -> List[str]:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -184,7 +181,7 @@ def rpc_getRoom(room_id: str) -> Room:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -212,7 +209,7 @@ def rpc_getAllPrograms() -> List[Program]:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -243,7 +240,7 @@ def rpc_listAllDevices() -> List[str]:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -265,7 +262,7 @@ def rpc_getDevice(device_id: str):
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -287,7 +284,7 @@ def rpc_listAllInterfaces() -> List[Interface]:
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:
@@ -317,7 +314,7 @@ def rpc_getChannelValue(channel_id: str):
         if _logging:
             print("Request: {0}".format(request_body))
         start_time = time.time()
-        response = requests.post(config_data['ccu3_config']['connection']['url'], request_body)
+        response = requests.post(ccu3_config_data['connection']['url'], request_body)
         stop_time = time.time()
         duration = (stop_time - start_time) * 1000
         if _logging:

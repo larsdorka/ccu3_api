@@ -20,18 +20,18 @@ api.add_middleware(CORSMiddleware,
                    allow_methods=["*"],
                    allow_headers=["*"])
 
-api.mount("/WindowState", StaticFiles(directory="WindowState", html=True), name="WindowState")
+api.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 
 @api.get('/')
 def index():
-    response = RedirectResponse(url='/WindowState')
+    response = RedirectResponse(url='/static')
     return response
 
 
 @api.get('/favicon.ico')
 def favicon():
-    response = RedirectResponse(url='/WindowState/favicon.ico')
+    response = RedirectResponse(url='/static/img/favicon.ico')
     return response
 
 

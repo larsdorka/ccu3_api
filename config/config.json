@@ -74,6 +74,9 @@
       "url": "http://10.30.1.48/api/homematic.cgi",
       "username": "json-rpc",
       "password": "P0EmLJPdCfx0wi8T"
+    },
+    "parameters": {
+      "refresh_interval_s": 10
     }
   }
 }

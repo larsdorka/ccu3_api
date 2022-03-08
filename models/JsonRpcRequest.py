@@ -44,51 +44,6 @@ class VariableGetAllRequest(JsonRpcRequest):
     method: str = "SysVar.getAll"
 
 
-class RoomGetAllRequest(JsonRpcRequest):
-    params: SessionIdParams = SessionIdParams()
-    method: str = "Room.getAll"
-
-
-class RoomListAllRequest(JsonRpcRequest):
-    params: SessionIdParams = SessionIdParams()
-    method: str = "Room.listAll"
-
-
-class RoomGetRequest(JsonRpcRequest):
-    params: SessionIdAndIdParams = SessionIdAndIdParams()
-    method: str = "Room.get"
-
-
-class ProgramGetAllRequest(JsonRpcRequest):
-    params: SessionIdParams = SessionIdParams()
-    method: str = "Program.getAll"
-
-
-class ProgramGetRequest(JsonRpcRequest):
-    params: SessionIdAndIdParams = SessionIdAndIdParams()
-    method: str = "Program.get"
-
-
-class DeviceListAllRequest(JsonRpcRequest):
-    params: SessionIdParams = SessionIdParams()
-    method: str = "Device.listAll"
-
-
-class DeviceGetRequest(JsonRpcRequest):
-    params: SessionIdAndIdParams = SessionIdAndIdParams()
-    method: str = "Device.get"
-
-
-class InterfaceListAllRequest(JsonRpcRequest):
-    params: SessionIdParams = SessionIdParams()
-    method: str = "Interface.listInterfaces"
-
-
-class ChannelGetValueRequest(JsonRpcRequest):
-    params: SessionIdAndIdParams = SessionIdAndIdParams()
-    method: str = "Channel.getValue"
-
-
 # login_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.login", "params": {"username":"", "password":""}}'
 # logout_string = '{"jsonrpc": "1.1", "id": 0, "method": "Session.logout", "params": {"_session_id_":""}}'
 # getall_string = '{"jsonrpc": "1.1", "id": 0, "method": "SysVar.getAll", "params": {"_session_id_":""}}'

@@ -44,7 +44,5 @@ def api_deactivate_logging():
 
 @api.get('/api/v1/ccu3_get_windowstates')
 def api_get_windowstates() -> WindowStateData:
-    ccu3_connector.rpc_login()
-    ccu3_connector.get_windowstatedata()
-    ccu3_connector.rpc_logout()
+    ccu3_connector.refreshWindowStateData()
     return ccu3_connector.windowstate_data

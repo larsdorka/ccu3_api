@@ -9,6 +9,7 @@ from models.WindowStateData import WindowStateData, RoomState
 
 _session_id = ""
 _logging = False
+_latest_refresh = 0.0
 
 ccu3_config_data: dict = {}
 windowstate_data: WindowStateData = WindowStateData()
@@ -112,4 +113,15 @@ def get_windowstatedata():
         error_state = True
     if error_state:
         print(error_message)
+    return
+
+
+def refreshWindowStateData():
+    global _latest_refresh
+    refresh_interval_s = ccu3_config_data['parameters']['refresh_interval_s']
+    if time.time() - _latest_refresh > refresh_interval_s:
+        rpc_login()
+        get_windowstatedata()
+        rpc_logout()
+        _latest_refresh = time.time()
     return

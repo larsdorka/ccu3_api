@@ -6,48 +6,44 @@
   "ccu3_config": {
     "variables": [
       {
-        "id": "1658",
-        "name": "Software"
-      },
-      {
         "id": "1354",
-        "name": "Buero Winderl"
+        "name": "A52 Buero Winderl"
       },
       {
         "id": "1747",
-        "name": "Besprechung gross"
+        "name": "A52 Besprechung gross"
       },
       {
         "id": "1745",
-        "name": "Buero Fleischmann"
+        "name": "A52 Buero Fleischmann"
       },
       {
         "id": "1746",
-        "name": "Buero Gimpl"
+        "name": "A52 Buero Gimpl"
       },
       {
         "id": "1744",
-        "name": "Buero Weingarten"
+        "name": "A52 Buero Weingarten"
+      },
+      {
+        "id": "1658",
+        "name": "A52 Software"
       },
       {
         "id": "1743",
-        "name": "Hardware"
+        "name": "A52 Hardware"
       },
       {
         "id": "2573",
-        "name": "Labor"
+        "name": "A52 Labor"
       },
       {
         "id": "1748",
-        "name": "Werkstatt"
+        "name": "A52 Werkstatt"
       },
       {
         "id": "1657",
-        "name": "Automatisierung"
-      },
-      {
-        "id": "2572",
-        "name": "Serverraum"
+        "name": "A52 Automatisierung"
       },
       {
         "id": "12578",
@@ -63,7 +59,11 @@
       },
       {
         "id": "12581",
-        "name": "A71 Halle"
+        "name": "A71 Mechanik"
+      },
+      {
+        "id": "2572",
+        "name": "A71 Elektrik"
       },
       {
         "id": "12583",
